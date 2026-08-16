@@ -1,0 +1,10 @@
+# ── Backend (Python / FastAPI) ────────────────────────────────────────────
+backend/.env
+backend/app.db
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.venv/
+backend/*.pyc
+
+# ── General ──────────────────────────────────────────────────────────────
+.DS_Store

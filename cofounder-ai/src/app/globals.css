@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #14213D;
+  --color-paper: #FDFCF7;
+  --color-card: #F4F2EA;
+  --color-brandBlue: #2E6FF2;
+  --color-brandBlueSoft: #E4EDFF;
+  --color-brandGreen: #3E8E5A;
+  --color-brandGreenSoft: #E6F3EA;
+  --color-watchOut: #F2A93B;
+  --color-watchOutSoft: #FCEFDA;
+  
+  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
