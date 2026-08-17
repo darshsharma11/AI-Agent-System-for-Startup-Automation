@@ -9,7 +9,7 @@ from app.agents.llm import llm
 from app.agents.coordinator import run_coordinator
 
 # Import agents so they self-register
-from app.agents import customer_support
+from app.agents import customer_support, sales_outreach
 
 __all__ = [
     "AGENTS",
@@ -18,4 +18,5 @@ __all__ = [
     "llm",
     "run_coordinator",
     "customer_support",
+    "sales_outreach",
 ]

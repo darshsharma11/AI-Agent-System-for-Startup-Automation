@@ -34,14 +34,19 @@ def coordinate_task(company_id: str, message: str, db: Session) -> dict[str, Any
         goal="Classify user requests and route them to the appropriate specialized agent",
         backstory="""You are an intelligent coordinator that analyzes user requests and 
         determines which AI agent should handle them. You understand the capabilities of:
-        - customer_support: Handle customer inquiries, support tickets, bug reports
-        - sales_outreach: Manage leads, outreach sequences, prospecting (NOT YET IMPLEMENTED)
+        
+        - customer_support: Handle customer inquiries, support tickets, bug reports, technical issues
+          Examples: "Help with login", "Bug report", "Account problem", "Technical issue"
+        
+        - sales_outreach: Manage leads, create outreach sequences, prospecting, cold emails
+          Examples: "Generate leads", "Create outreach for [company]", "Send cold emails", "Prospect new customers"
+        
         - content_creation: Generate blog posts, social media, landing pages (NOT YET IMPLEMENTED)
         - marketing_ads: Create ad campaigns, budget allocation (NOT YET IMPLEMENTED)
         - analytics: Data analysis, reporting, insights (NOT YET IMPLEMENTED)
         - multi: Complex tasks requiring multiple agents (NOT YET IMPLEMENTED)
         
-        For now, route everything to customer_support until other agents are implemented.""",
+        Focus on routing to customer_support or sales_outreach based on the intent.""",
         llm=llm,
         verbose=True,
     )
@@ -52,19 +57,23 @@ def coordinate_task(company_id: str, message: str, db: Session) -> dict[str, Any
         
         Message: {message}
         
+        Routing Guidelines:
+        - Use "customer_support" for: support tickets, bugs, technical help, customer questions
+        - Use "sales_outreach" for: lead generation, cold outreach, prospecting, sales sequences
+        - Use "content_creation" for: blog posts, social media, content generation (not yet available)
+        - Use "marketing_ads" for: ad campaigns, marketing strategy (not yet available)
+        
         Return ONLY valid JSON in this exact format (no markdown, no code fences):
         {{
-            "agent": "customer_support",
+            "agent": "customer_support|sales_outreach|content_creation|marketing_ads|analytics|multi",
             "reasoning": "brief explanation of why this agent was chosen",
             "subtasks": [
                 {{
-                    "agent": "customer_support",
+                    "agent": "customer_support|sales_outreach",
                     "instruction": "the specific instruction for this agent"
                 }}
             ]
         }}
-        
-        Valid agent values: customer_support, sales_outreach, content_creation, marketing_ads, analytics, multi
         
         IMPORTANT: Return ONLY the JSON object, no other text or formatting.""",
         agent=coordinator,
