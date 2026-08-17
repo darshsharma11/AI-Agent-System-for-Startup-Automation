@@ -1,4 +1,4 @@
-﻿"""
+"""
 Coordinator agent — routes user messages to the appropriate specialized agent.
 
 Uses CrewAI to classify the intent and determine which agent(s) should handle the task.
@@ -139,28 +139,56 @@ def run_coordinator(company_id: str, message: str, db: Session) -> AgentResult:
         db: Database session
         
     Returns:
-        AgentResult with coordination decision
+        AgentResult with coordination decision and execution results
     """
     # Get routing decision
     decision = coordinate_task(company_id, message, db)
+    target_agent_name = decision.get("agent", "customer_support")
     
     # Log the coordination activity
     activity = ActivityLog(
         company_id=company_id,
         agent="coordinator",
         instruction=message,
-        summary=f"Routed to {decision['agent']}: {decision['reasoning']}",
+        summary=f"Routed to {target_agent_name}: {decision.get('reasoning', '')}",
     )
     db.add(activity)
     db.commit()
     
+    # Dispatch to the appropriate agent
+    from app.agents import AGENTS
+    
+    agent_results = []
+    
+    if target_agent_name in ["customer_support", "sales_outreach"]:
+        target_agent = AGENTS.get(target_agent_name)
+        if target_agent:
+            # We assume subtasks has at least one instruction
+            subtasks = decision.get("subtasks", [])
+            for task in subtasks:
+                if task.get("agent") == target_agent_name:
+                    # Run the agent
+                    res = target_agent(
+                        company_id=company_id,
+                        instruction=task.get("instruction", message),
+                        db=db
+                    )
+                    agent_results.append(res)
+    
+    if agent_results:
+        # Combine results
+        return AgentResult(
+            summary=f"Routed to {target_agent_name}. {agent_results[0].summary}",
+            data={
+                "coordination": decision,
+                "execution": [r.data for r in agent_results]
+            },
+            log_entry=f"Coordinator routed to {target_agent_name}. Execution log: {agent_results[0].log_entry}"
+        )
+
     return AgentResult(
-        summary=f"Routed to {decision['agent']}",
+        summary=f"Routed to {target_agent_name} (Not implemented or failed to run)",
         data=decision,
-        log_entry=f"Coordinator analyzed message and routed to {decision['agent']}. "
-                  f"Reasoning: {decision['reasoning']}"
+        log_entry=f"Coordinator analyzed message and routed to {target_agent_name}. "
+                  f"Reasoning: {decision.get('reasoning', '')}"
     )
-
-
-# TODO: Implement dispatch_to_agent() that actually calls AGENTS[agent_name]
-# For now, coordinator just returns the routing decision
