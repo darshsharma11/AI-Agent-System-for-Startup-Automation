@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 export default function Home() {
@@ -37,9 +38,9 @@ export default function Home() {
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
-            <button className="bg-white text-ink px-6 py-3 rounded-xl font-semibold hover:bg-paper transition-colors shadow-lg">
+            <Link href="/signup" className="bg-white text-ink px-6 py-3 rounded-xl font-semibold hover:bg-paper transition-colors shadow-lg">
               Run a company
-            </button>
+            </Link>
             <button className="bg-[#38bdf8]/80 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#38bdf8] transition-colors border border-white/20 shadow-lg">
               Check out the launch
             </button>
