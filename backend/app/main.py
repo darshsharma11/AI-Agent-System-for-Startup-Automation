@@ -1,4 +1,4 @@
-"""
+﻿"""
 FastAPI application — entry point.
 Run with: uvicorn app.main:app --reload
 """
@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.routers import auth, companies
 
 app = FastAPI(
     title="Cofounder AI — Backend",
@@ -22,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Routers ─────────────────────────────────────────────────────────────
+app.include_router(auth.router)
+app.include_router(companies.router)
 
 
 # ── Health probe ────────────────────────────────────────────────────────
