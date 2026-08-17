@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, companies
+from app.routers import auth, companies, agents
 
 app = FastAPI(
     title="Cofounder AI — Backend",
@@ -27,6 +27,7 @@ app.add_middleware(
 # ── Routers ─────────────────────────────────────────────────────────────
 app.include_router(auth.router)
 app.include_router(companies.router)
+app.include_router(agents.router)
 
 
 # ── Health probe ────────────────────────────────────────────────────────
