@@ -33,14 +33,6 @@ class AgentRequest(BaseModel):
     ticket_id: Optional[str] = None
 
 
-class SalesAgentRequest(BaseModel):
-    """Request to run the sales agent."""
-    company_id: str
-    message: str
-    icp: Optional[str] = None
-    leads: Optional[list[dict]] = None
-
-
 class AgentResponse(BaseModel):
     """Response from an agent."""
     summary: str
@@ -129,48 +121,6 @@ def run_support_agent(
     activity = ActivityLog(
         company_id=request.company_id,
         agent="customer_support",
-        instruction=request.message,
-        summary=result.summary,
-    )
-    db.add(activity)
-    db.commit()
-    
-    return AgentResponse(
-        summary=result.summary,
-        data=result.data,
-        log_entry=result.log_entry,
-    )
-
-
-@router.post("/sales", response_model=AgentResponse)
-def run_sales_agent(
-    request: SalesAgentRequest,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[Session, Depends(get_db)],
-) -> AgentResponse:
-    """
-    Run the sales outreach agent directly.
-    """
-    assert_owns_company(current_user.id, request.company_id, db)
-    
-    sales_agent = AGENTS.get("sales_outreach")
-    if not sales_agent:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Sales agent not available"
-        )
-    
-    result = sales_agent(
-        company_id=request.company_id,
-        instruction=request.message,
-        db=db,
-        icp=request.icp,
-        leads=request.leads,
-    )
-    
-    activity = ActivityLog(
-        company_id=request.company_id,
-        agent="sales_outreach",
         instruction=request.message,
         summary=result.summary,
     )
